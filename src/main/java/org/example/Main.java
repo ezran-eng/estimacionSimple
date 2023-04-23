@@ -1,17 +1,29 @@
 package org.example;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        String input = scanner.nextLine();
-        int length = input.length();
-        if (length > 100) {
-            System.out.println("HARD");
-        } else {
-            System.out.println("EASY");
+        File file = new File("src/ejemplo.txt");
+        int count = 0;
+        try {
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                int num = scanner.nextInt();
+                if (num == 0) {
+                    break;
+                }
+                if (num % 2 == 0) {
+                    count++;
+                }
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found!");
         }
-        scanner.close();
+        System.out.println(count);
     }
 }
+//src/numbers.txt
