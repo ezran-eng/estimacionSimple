@@ -1,12 +1,12 @@
-# Evaluar la Legibilidad del Texto
-¿Alguna vez te has preguntado cómo evaluar si un texto es fácil o difícil de leer? Para un humano, esta tarea es bastante simple: solo lees el texto y sientes si te estás esforzando o no. Pero, ¿cómo enseñar a una computadora a hacer eso? 
-## Descripción del Problema
-En primer lugar, cree un programa simple. Si un texto contiene más de 100 símbolos (incluyendo espacios y puntuación), se considera difícil de leer. De lo contrario, el texto se considera fácil de leer. Si un texto contiene exactamente 100 símbolos, aún se considera fácil de leer.
+## Lectura fácil
+Este programa determina si un texto es fácil o difícil de leer basándose en el número de palabras por oración. Si el promedio es mayor a 10 palabras por oración, el texto es considerado difícil de leer, de lo contrario, es fácil de leer.
 
-La entrada contiene una sola línea de texto. Si el texto es difícil de leer, el programa debe imprimir "HARD" y si es fácil de leer, el programa debe imprimir "EASY".
+# Cómo usar
+La entrada es una sola línea de texto. Para usar el programa, simplemente ingrese el texto que desea analizar y el programa le indicará si es fácil o difícil de leer.
 
+# Ejemplo
+Si el texto contiene dos oraciones con 6 y 10 palabras (los números también cuentan como palabras) el promedio es 8, y esto es menos que 10. En este caso, el programa mostrará "EASY". En cambio, si hay 2 oraciones con 6 y 16 palabras, el promedio es 11 y esto es más que 10, en este caso, el programa mostrará "HARD". Si el promedio es igual a 10, el texto aún se considera fácil de leer.
 
-¡Probalo por vos mismo y evalúa la legibilidad del texto!
-
-
+# Notas adicionales
+Recuerde que las oraciones pueden terminar con un punto, signo de exclamación o signo de interrogación. Sin embargo, la última oración puede ser con o sin signo de puntuación al final. En las próximas etapas, se considerarán formas más científicas para determinar la legibilidad del texto.
 
