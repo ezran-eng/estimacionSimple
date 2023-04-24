@@ -7,6 +7,25 @@ import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
 public class Main {
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            System.out.println("You must provide a valid path for the file containing your text.");
+            return;
+        }
+        try {
+            final var path = Paths.get(args[0]);
+            final var text = Files.readString(path);
+            System.out.println("The text is:");
+            System.out.println(text);
+            System.out.println();
+            System.out.println(formattedReadabilityData(text));
+        } catch (InvalidPathException ipe) {
+            System.out.println("Invalid path");
+        } catch (IOException ioe) {
+            System.out.println("Cannot read file");
+        }
+    }
+
     public static double readabilityScore(String text) {
         if (text == null || text.isEmpty()) {
             return 0;
@@ -70,22 +89,5 @@ public class Main {
         );
     }
 
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            System.out.println("You must provide a valid path for the file containing your text.");
-            return;
-        }
-        try {
-            final var path = Paths.get(args[0]);
-            final var text = Files.readString(path);
-            System.out.println("The text is:");
-            System.out.println(text);
-            System.out.println();
-            System.out.println(formattedReadabilityData(text));
-        } catch (InvalidPathException ipe) {
-            System.out.println("Invalid path");
-        } catch (IOException ioe) {
-            System.out.println("Cannot read file");
-        }
-    }
+
 }
