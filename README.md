@@ -9,4 +9,18 @@ La entrada contiene una sola línea de texto. Si el texto es difícil de leer, e
 ¡Probalo por vos mismo y evalúa la legibilidad del texto!
 
 
-
+Score  | age | grade level
+1      |5 - 6| Kindergarten
+2      |6 - 7| 1st grade
+3      |7 - 8| 2nd grade
+4      |8 - 9| 3rd grade
+5      |9 - 10| 4th grade
+6      |10 - 11| 5th grade
+7      |11 - 12| 6th grade
+8      |12 - 13| 7th grade
+9      |13 - 14| 8th & 9th grade
+10     |14 - 15| 10th & 11th grade
+11     |15 - 16| 12th grade
+12     |16 - 17| College student
+13     |17 - 18| College graduate
+14     |18 - 24| College graduate
