@@ -1,93 +1,47 @@
 package org.example;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
-import java.util.regex.Pattern;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 
 public class Main {
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.out.println("You must provide a valid path for the file containing your text.");
-            return;
-        }
-        try {
-            final var path = Paths.get(args[0]);
-            final var text = Files.readString(path);
-            System.out.println("The text is:");
-            System.out.println(text);
-            System.out.println();
-            System.out.println(formattedReadabilityData(text));
-        } catch (InvalidPathException ipe) {
-            System.out.println("Invalid path");
-        } catch (IOException ioe) {
-            System.out.println("Cannot read file");
-        }
-    }
+        int words = 0;//se inicializa un contador de palabras
+        int sentences = 0;//se inicializa un contador de oraciones
+        int characters = 0;//se inicializa un contador de caracteres
+        double score = 0;//se inicializa un score
 
-    public static double readabilityScore(String text) {
-        if (text == null || text.isEmpty()) {
-            return 0;
+        StringBuilder text = new StringBuilder();//se crea un string builder para almacenar el texto
+
+        try(Scanner scanner = new Scanner(new File(args[0]))) {//lo que pasa aqui es que se crea un scanner para leer el archivo, el cual se pasa como argumento
+            while (scanner.hasNextLine()) {
+                text.append(scanner.nextLine()).append(" ");
+
+                words += text.toString().split("\\s+").length;
+                sentences += text.toString().split("[?!.]\\s+").length;
+                characters += text.toString().replaceAll("\\s", "").length();
+                score = score(words, characters, sentences);
+            }
+        } catch (FileNotFoundException ignored) {
         }
-        long chars = charsCount(text);
-        long words = wordCount(text);
-        long sentences = sentenceCount(text);
-        double readability = Math.round((4.71 * chars / words + 0.5 * words / sentences - 21.43) * 100.0) / 100.0;
-        return Math.max(0.0, readability);   // if readability is less than 0, we return 0
-    }
 
-    public static long charsCount(String text) {
-        if (text == null || text.isEmpty()) {
-            return 0L;
-        }
-        var charPattern = Pattern.compile("\\S");
-        var charMatcher = charPattern.matcher(text);
-        return charMatcher.results().count();
-    }
+        int sc = (int) Math.ceil(score);
 
-    public static long wordCount(String text) {
-        if (text == null || text.isEmpty()) {
-            return 0L;
-        }
-        var wordPattern = Pattern.compile("\\S+");
-        var wordMatcher = wordPattern.matcher(text);
-        return wordMatcher.results().count();
-    }
-
-    public static long sentenceCount(String text) {
-        if (text == null || text.isEmpty()) {
-            return 0L;
-        }
-        var sentencePattern = Pattern.compile("[^.?!]+");
-        var sentenceMatcher = sentencePattern.matcher(text);
-        return sentenceMatcher.results().count();
-    }
-
-    public static String ageBracket(int readabilityTruncated) {
-        int lowerAge = readabilityTruncated + 5;
-        int upperAge = readabilityTruncated > 13 ? 22 : readabilityTruncated + 6;
-        return String.format("%d-%d", lowerAge, upperAge);
-    }
-
-    public static String formattedReadabilityData(String text) {
-        String template = """
+        System.out.printf("""
+                The text is:
+                %s
+                
                 Words: %d
                 Sentences: %d
                 Characters: %d
                 The score is: %.2f
-                This text should be understood by %s year-olds.""".stripIndent();
-        if (text == null) {
-            return template.formatted(0, 0, 0, 0.0, ageBracket(0));
-        }
-        return template.formatted(
-                wordCount(text),
-                sentenceCount(text),
-                charsCount(text),
-                readabilityScore(text),
-                ageBracket((int) readabilityScore(text))
-        );
+                This text should be understood by %s year-olds."""
+                , text, words, sentences, characters, score, sc == 14 ? "18-22" : String.format("%d-%d", sc + 4, sc + 5));
     }
 
-
+    private static double score(int words, int characters, int sentences) {
+        return 4.71 * (characters / Double.valueOf(words)) + 0.5 *
+                (words / Double.valueOf(sentences)) - 21.43;
+    }
 }
