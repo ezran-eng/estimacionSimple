@@ -1,101 +1,160 @@
 package org.example;
 
-/*
-Implementar diferentes enfoques científicos para calcular una puntuación de legibilidad.
 
-Echa un vistazo a las diferentes edades y puntuaciones correspondientes en la tabla del artículo ARI en Wikipedia. Esta tabla es adecuada para todos los algoritmos descritos en esta etapa. Para calcular la edad, utiliza el límite superior del rango. Por ejemplo, si el rango es para niños de 12 a 13 años, entonces su límite superior es de 13 años.
-
-El primer algoritmo es la prueba de legibilidad Flesch-Kincaid. Primero, necesitas crear un método que calcule el número de sílabas en una palabra. La fórmula se proporciona a continuación. Puedes encontrar más información en el artículo correspondiente en Wikipedia. Puedes utilizar la segunda fórmula para calcular el índice; esto te permite calcular fácilmente la edad de una persona utilizando la misma tabla del Índice de Legibilidad Automatizado.
-
-Puntuación = 0.39 * (oraciones / palabras) + 11.8 * (palabras / sílabas) - 15.59
-
-El segundo es el índice SMOG. SMOG significa Simple Measure of Gobbledygook (Medida simple del lenguaje incomprensible). Para calcularlo, necesitas contar el número de polisílabos, que es el número de palabras con más de 2 sílabas. La fórmula se muestra a continuación. Puedes encontrar más información en el artículo de Wikipedia sobre SMOG. El artículo dice que se requieren al menos 30 oraciones para que este índice funcione correctamente. No le prestes atención a esto, solo tenlo en cuenta cuando uses este índice en la vida real. Como en el ejemplo anterior, aquí se calcula el nivel de grado, por lo que para obtener la edad de una persona necesitas usar la tabla del primer enlace.
-
-double score = 1.049 * Math.sqrt(polysyllables * 30 / sentences) + 3.1291;
-
-El siguiente problema es el índice de Coleman-Liau. La fórmula se muestra a continuación. Para obtener más información, lee el artículo en Wikipedia. L es el número promedio de caracteres por cada 100 palabras y S es el número promedio de oraciones por cada 100 palabras. Como todos los demás índices, la salida es el nivel de grado de una persona. Al igual que todos los demás índices, el resultado es el nivel de grado mínimo necesario para comprender este texto.
-
-score=0.0588*L - 0.296 * S - 15.8
-
-Entonces, en esta etapa, debes programar los tres enfoques. ¡No te olvides del Índice de Legibilidad Automática! Además, debe haber una opción para elegir todos los métodos al mismo tiempo.
-
-Para contar el número de sílabas, debes usar las letras a, e, i, o, u, y como vocales. En el breve artículo sobre vocales en Wikipedia puedes ver ejemplos e intrincaciones para determinar las vocales en una palabra con un 100% de precisión. Entonces, usemos las siguientes 4 reglas:
-
-1-Cuenta el número de vocales en la palabra.
-2-No cuentes doble-vocales (por ejemplo, "rain" tiene 2 vocales pero solo 1 sílaba).
-3-Si la última letra de la palabra es 'e', no la cuentes como una vocal (por ejemplo, "side" tiene 1 sílaba).
-4-Si al final resulta que la palabra no contiene vocales, considera esta palabra como una de una sola sílaba.
-
-EXAMPLES
-El símbolo mayor que seguido de un espacio (>) representa la entrada del usuario. Ten en cuenta que no forma parte de la entrada.
-
-> java Main in.txt
-The text is:
-This is the front page of the Simple English Wikipedia. Wikipedias are places where people work together to write encyclopedias in different languages. We use Simple English words and grammar here. The Simple English Wikipedia is for everyone! That includes children and adults who are learning English. There are 142,262 articles on the Simple English Wikipedia. All of the pages are free to use. They have all been published under both the Creative Commons License and the GNU Free Documentation License. You can help here! You may change these pages and make new pages. Read the help pages and other good pages to learn how to write pages here. If you need help, you may ask questions at Simple talk. Use Basic English vocabulary and shorter sentences. This allows people to understand normally complex terms or phrases.
-
-Words: 137
-Sentences: 14
-Characters: 687
-Syllables: 210
-Polysyllables: 17
-Enter the score you want to calculate (ARI, FK, SMOG, CL, all): all
-
-Automated Readability Index: 7.08 (about 13-year-olds).
-Flesch–Kincaid readability tests: 6.31 (about 12-year-olds).
-Simple Measure of Gobbledygook: 9.42 (about 15-year-olds).
-Coleman–Liau index: 10.66 (about 17-year-olds).
-
-This text should be understood in average by 14.25-year-olds.
-
-RECOMENDACIONES
-Las líneas con puntuación deben contener "años" (la 's' no está presente en "año")
-Las líneas correspondientes deben comenzar con "flesch-kincaid" (significa guion Unicode) y con "coleman-liau" (significa guion)
-Debe haber un salto de línea antes de "índice de legibilidad automatizado"
-La última línea con la edad promedio no se verifica.
-
-*/
-
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Scanner;
 
+import static java.util.Map.entry;
+
 public class Main {
-    public static void main(String[] args) {
-        int words = 0;
-        int sentences = 0;
-        int characters = 0;
-        double score = 0;
+    public static void main(String[] args)throws IOException {
+        Scanner scanner = new Scanner(System.in);
+        String fileName = args[0];
 
-        StringBuilder text = new StringBuilder();
+        System.out.println(fileName);
+        String text = new String(Files.readAllBytes(Paths.get(fileName)));
 
-        try(Scanner scanner = new Scanner(new File(args[0]))) {
-            while (scanner.hasNextLine()) {
-                text.append(scanner.nextLine()).append(" ");
+        System.out.println("The text is:");
+        System.out.println(text);
+        System.out.println();
+        int wordCount = calculateWordCount(text);
+        int sentenceCount = calculateSentenceCount(text);
+        int characterCount = calculateCharacterCount(text);
+        int syllableCount = calculateSyllableCount(text);
+        int polySyllableCount = calculatePolySyllableCount(text);
 
-                words += text.toString().split("\\s+").length;
-                sentences += text.toString().split("[?!.]\\s+").length;
-                characters += text.toString().replaceAll("\\s", "").length();
-                score = score(words, characters, sentences);
-            }
-        } catch (FileNotFoundException ignored) {
+        System.out.printf("Words: %d\n", wordCount);
+        System.out.printf("Sentences: %d\n", sentenceCount);
+        System.out.printf("Characters: %d\n", characterCount);
+        System.out.printf("Syllables: %d\n", syllableCount);
+        System.out.printf("Polysyllables: %d\n", polySyllableCount);
+
+        double ariScore = calculateARIndexScore(wordCount, sentenceCount, characterCount);
+        double fkScore = calculateFKIndexScore(wordCount, sentenceCount, syllableCount);
+        double smogScore = calculateSMOGIndexScore(sentenceCount, polySyllableCount);
+        double clScore = calculateCLIndexScore(sentenceCount, wordCount, characterCount);
+
+        int ariAge = calculateAgeFromIndexScore(ariScore);
+        int fkAge = calculateAgeFromIndexScore(fkScore);
+        int smogAge = calculateAgeFromIndexScore(smogScore);
+        int clAge = calculateAgeFromIndexScore(clScore);
+
+        double avgAge = (double) (ariAge + fkAge + smogAge + clAge) / 4;
+
+        System.out.print("Enter the score you want to calculate (ARI, FK, SMOG, CL, all): ");
+        String selection = scanner.nextLine().trim();
+        System.out.println("");
+        switch(selection){
+            case "ARI":
+                System.out.printf("Automated Readability Index: %.2f (about %d year olds).%n", ariScore, ariAge);
+                break;
+            case "FK":
+                System.out.printf("Flesch–Kincaid readability tests: %.2f (about %d year olds).%n", fkScore, fkAge);
+                break;
+            case "SMOG":
+                System.out.printf("Simple Measure of Gobbledygook: %.2f (about %d year olds).%n", smogScore, smogAge);
+                break;
+            case "CL":
+                System.out.printf("Coleman–Liau index: %.2f (about %d year olds).%n", clScore, clAge);
+                break;
+            case "all":
+                System.out.printf("Automated Readability Index: %.2f (about %d year olds).%n", ariScore, ariAge);
+                System.out.printf("Flesch–Kincaid readability tests: %.2f (about %d year olds).%n", fkScore, fkAge);
+                System.out.printf("Simple Measure of Gobbledygook: %.2f (about %d year olds).%n", smogScore, smogAge);
+                System.out.printf("Coleman–Liau index: %.2f (about %d year olds).%n", clScore, clAge);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + selection);
         }
 
-        int sc = (int) Math.ceil(score);
-
-        System.out.printf("""
-                The text is:
-                %s
-                
-                Words: %d
-                Sentences: %d
-                Characters: %d
-                The score is: %.2f
-                This text should be understood by %s year-olds."""
-                , text, words, sentences, characters, score, sc == 14 ? "18-22" : String.format("%d-%d", sc + 4, sc + 5));
+        System.out.printf("This text should be understood in average by %.2f year olds.", avgAge);
     }
 
-    private static double score(int words, int characters, int sentences) {
-        return 4.71 * (characters / Double.valueOf(words)) + 0.5 *
-                (words / Double.valueOf(sentences)) - 21.43;
+    private static int calculateWordCount(String text) {
+        return text.split(" ").length;
+    }
+
+    private static int calculateSentenceCount(String text) {
+        return text.split("[.!?]").length;
+    }
+
+    private static int calculateCharacterCount(String text) {
+        return text.replaceAll("\\s","").length();
+    }
+
+    private static int calculateSyllableCount(String text) {
+        String[] words = text.split(" ");
+        int syllableCount = 0;
+
+        for (String word : words) {
+            syllableCount += syllablesPerWord(word);
+        }
+
+        return syllableCount;
+    }
+
+    private static int calculatePolySyllableCount(String text) {
+        String[] words = text.split(" ");
+        int polySyllableCount = 0;
+
+        for (String word : words){
+            int syllables = syllablesPerWord(word);
+            if (syllables > 2)
+                polySyllableCount++;
+        }
+
+        return polySyllableCount;
+    }
+
+    private static int syllablesPerWord(String word) {
+        int count; // count of vowels
+        count = word
+                .replaceAll("[aeiouy]{2,}", "a") //replace double vowels
+                .replaceAll("e$", "") // replace word ending in e
+                .replaceAll("[^aeiouy]", "") // replace non-vowels
+                .length();
+
+        return Math.max(1, count);
+    }
+
+    private static double calculateARIndexScore(double wordCount, double sentenceCount, double characterCount) {
+        return 4.71 * (characterCount / wordCount) + 0.5 * (wordCount / sentenceCount) - 21.43;
+    }
+
+    private static double calculateFKIndexScore(int wordCount, int sentenceCount, int syllableCount) {
+        return 0.39 * wordCount / sentenceCount + 11.8 * syllableCount / wordCount - 15.59;
+    }
+
+    private static double calculateSMOGIndexScore(int sentenceCount, int polySyllableCount) {
+        return 1.043 * Math.sqrt(polySyllableCount * 30 / sentenceCount) + 3.1291;
+    }
+
+    private static double calculateCLIndexScore(int sentenceCount, int wordCount, int characterCount) {
+        return 0.0588 * (characterCount * 100 / (double) wordCount) - 0.296 * (sentenceCount * 100 / (double) wordCount) - 15.8;
+    }
+
+    private static int calculateAgeFromIndexScore(double score){
+        //https://en.wikipedia.org/wiki/Automated_readability_index
+        int scoreCeil = (int) Math.ceil(score);
+        Map<Integer, Integer> ages = Map.ofEntries(
+                entry(1, 6),
+                entry(2, 7),
+                entry(3, 9),
+                entry(4, 10),
+                entry(5, 11),
+                entry(6, 12),
+                entry(7, 13),
+                entry(8, 14),
+                entry(9, 15),
+                entry(10, 16),
+                entry(11, 17),
+                entry(12, 18),
+                entry(13, 24),
+                entry(14, 25)
+        );
+        return ages.getOrDefault((int) scoreCeil, 25);
     }
 }
